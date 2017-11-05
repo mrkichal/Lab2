@@ -65,17 +65,21 @@ def con_add():
     # for _ in range(2,100000000-2,2):
     #     adj_2.append([_] + room_temp_mean_adjusted[_+1])
     adj_2 = np.add.reduceat(room_temp_mean_adjusted, np.arange(0, len(room_temp_mean_adjusted), 100))
-    image_his_x = list(range(0, 200, 20))
+    image_his_x = list(range(100, 1000000, 16))
     adj_2 = adj_2 ** 2
+    # print(adj_2[0:100])
     plt.hist(adj_2, image_his_x, histtype='step', label='Data')
     plt.xlabel('ADC Value [bits]')
     plt.ylabel('Count')
-    plt.xlim(0, 200)
+    plt.ylim(1, 10000000)
+    plt.xlim(100, 1000000)
     # plt.ylim(30000, 4000000)
     plt.gca().set_yscale("log")
-    plt.title('Histogram of room temperature run, n = 10')
+    plt.gca().set_xscale("log")
+    plt.xlabel('Power sum over n=100')
+    plt.ylabel('Count')
+    plt.title('AirSpy Data')
     plt.show()
-
 
 def thousand_sample_avg():
     data = np.add.reduceat(room_temp_mean_adjusted, np.arange(0, len(room_temp_mean_adjusted), 1000))
@@ -93,9 +97,17 @@ def thousand_sample_avg():
 
 
 def fft():
-    data = np.fft.fft(room_temp_mean_adjusted)
-    real = np.square(np.real(data))
-    imag = np.square(np.imag(data))
-    data = real + imag
+    # data = np.fft.fft(room_temp_mean_adjusted)
+    # real = np.square(np.real(data))
+    # imag = np.square(np.imag(data))
+    # data = real + imag
+    # plt.plot()
 
-fft()
+    data = np.fft.fft(room_temp_mean_adjusted[0:2**19].reshape(-1,1024),axis=1)
+    print(data[0:10])
+    s = (data.real**2+data.imag**2).sum(axis=0)
+    plt.plot(10*np.log10(s[0:512]),'.')
+    plt.xlabel('Bins')
+    plt.xlabel('Power')
+    plt.title('Spectrum')
+    plt.show()
